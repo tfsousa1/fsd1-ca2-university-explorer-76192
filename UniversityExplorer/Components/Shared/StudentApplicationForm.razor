@@ -1,0 +1,72 @@
+@* Reusable form for creating and editing student applications. *@
+
+<EditForm Model="Application" OnValidSubmit="SubmitForm">
+
+    @* Checks the form fields using Data Annotations. *@
+    <DataAnnotationsValidator />
+
+    @* Displays validation messages for the form. *@
+    <ValidationSummary />
+
+    @* Student name field. *@
+    <div class="mb-3">
+        <label>Student Name</label>
+        <InputText class="form-control"
+                   @bind-Value="Application.StudentName" />
+        <ValidationMessage For="@(() => Application.StudentName)" />
+    </div>
+
+    @* Email address field. *@
+    <div class="mb-3">
+        <label>Email Address</label>
+        <InputText class="form-control"
+                   @bind-Value="Application.Email" />
+        <ValidationMessage For="@(() => Application.Email)" />
+    </div>
+
+    @* Country field. *@
+    <div class="mb-3">
+        <label>Country</label>
+        <InputText class="form-control"
+                   @bind-Value="Application.Country" />
+        <ValidationMessage For="@(() => Application.Country)" />
+    </div>
+
+    @* University name field. *@
+    <div class="mb-3">
+        <label>University Name</label>
+        <InputText class="form-control"
+                   @bind-Value="Application.University" />
+        <ValidationMessage For="@(() => Application.University)" />
+    </div>
+
+    @* Course name field. *@
+    <div class="mb-3">
+        <label>Course Name</label>
+        <InputText class="form-control"
+                   @bind-Value="Application.Course" />
+        <ValidationMessage For="@(() => Application.Course)" />
+    </div>
+
+    @* Submits the form when all validation rules pass. *@
+    <button type="submit" class="btn btn-primary">
+        Submit Application
+    </button>
+
+</EditForm>
+
+@code {
+    // Receives the application data from the parent page.
+    [Parameter]
+    public StudentApplication Application { get; set; } = new StudentApplication();
+
+    // Notifies the parent page when the form is valid and submitted.
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    // Invokes the parent page callback after successful validation.
+    private async Task SubmitForm()
+    {
+        await OnSubmit.InvokeAsync();
+    }
+}

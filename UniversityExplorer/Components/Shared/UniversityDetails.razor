@@ -1,0 +1,32 @@
+@* Displays detailed information about the selected university. *@
+
+<div class="card">
+    @* Displays the university name. *@
+    <h3>@University.Name</h3>
+
+    @* Displays the country where the university is located. *@
+    <p><strong>Country:</strong> @University.Country</p>
+
+    @* Displays the university website. *@
+    @if (University.WebPages.Count > 0)
+    {
+        <p>
+            <strong>Website:</strong>
+            <a href="@University.WebPages[0]" target="_blank">
+                @University.WebPages[0]
+            </a>
+        </p>
+    }
+
+    @* Displays the university domain. *@
+    @if (University.Domains.Count > 0)
+    {
+        <p><strong>Domain:</strong> @University.Domains[0]</p>
+    }
+</div>
+
+@code {
+    // Receives the selected university from the parent component.
+    [Parameter]
+    public University University { get; set; } = new University();
+}

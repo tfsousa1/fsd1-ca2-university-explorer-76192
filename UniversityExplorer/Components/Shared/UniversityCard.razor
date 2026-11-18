@@ -1,0 +1,41 @@
+@* Displays a university and allows the user to select it. *@
+
+<div class="card">
+    @* Displays the university name. *@
+    <h4>@University.Name</h4>
+
+    @* Displays the country where the university is located. *@
+    <p><strong>Country:</strong> @University.Country</p>
+
+    @* Displays the university website. *@
+    @if (University.WebPages.Count > 0)
+    {
+        <p>
+            <strong>Website:</strong>
+            <a href="@University.WebPages[0]" target="_blank">
+                @University.WebPages[0]
+            </a>
+        </p>
+    }
+
+    @* Notifies the parent component when the university is selected. *@
+    <button @onclick="SelectUniversity">
+        View Details
+    </button>
+</div>
+
+@code {
+    // Receives the university information from the parent component.
+    [Parameter]
+    public University University { get; set; } = new University();
+
+    // Sends the selected university back to the parent component.
+    [Parameter]
+    public EventCallback<University> OnUniversitySelected { get; set; }
+
+    // Invokes the callback when the user clicks the button.
+    private async Task SelectUniversity()
+    {
+        await OnUniversitySelected.InvokeAsync(University);
+    }
+}

@@ -1,0 +1,17 @@
+@* Displays the details of the selected country. *@
+
+<div class="card">
+    <h3>@Country.Name</h3>
+
+    <img src="@Country.Flags.Png" alt="Flag of @Country.Name" />
+
+    <p><strong>Capital:</strong> @Country.Capital</p>
+    <p><strong>Region:</strong> @Country.Region</p>
+    <p><strong>Population:</strong> @Country.Population</p>
+</div>
+
+@code {
+    // Receives the selected country from the parent component.
+    [Parameter]
+    public Country Country { get; set; } = new Country();
+}

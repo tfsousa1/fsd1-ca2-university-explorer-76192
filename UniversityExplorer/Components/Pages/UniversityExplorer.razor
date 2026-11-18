@@ -1,0 +1,201 @@
+@page "/university-explorer"
+@rendermode InteractiveServer
+
+@inject CountryService CountryService
+@inject UniversityService UniversityService
+
+@* Sets the browser page title. *@
+<PageTitle>University Explorer</PageTitle>
+
+<h1>University Explorer</h1>
+<p>Select a country to explore its universities.</p>
+
+@* Displays an error message when an API request fails. *@
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+@* Displays a loading message while countries are being retrieved. *@
+@if (isLoadingCountries)
+{
+    <p>Loading countries...</p>
+}
+else
+{
+    @* Allows the user to select a country. *@
+    <div class="mb-3">
+        <label for="countrySelect" class="form-label">Select Country</label>
+
+        <select id="countrySelect"
+                class="form-select"
+                value="@selectedCountryName"
+                @onchange="OnCountryChanged">
+
+            <option value="">Select a country</option>
+
+            @foreach (var country in countries)
+            {
+                <option value="@country.Name">@country.Name</option>
+            }
+        </select>
+    </div>
+}
+
+@* Displays the selected country's information. *@
+@if (selectedCountry != null)
+{
+    <CountryDetails Country="selectedCountry" />
+}
+
+@* Displays universities for the selected country. *@
+@if (selectedCountry != null)
+{
+    <h2>Universities</h2>
+
+    @* Allows the user to search universities by name. *@
+    <div class="mb-3">
+        <label for="universitySearch" class="form-label">
+            Search Universities
+        </label>
+
+        <input id="universitySearch"
+               class="form-control"
+               placeholder="Search by university name..."
+               @bind="searchText"
+               @bind:event="oninput" />
+    </div>
+
+    @* Displays a loading message while universities are being retrieved. *@
+    @if (isLoadingUniversities)
+    {
+        <p>Loading universities...</p>
+    }
+    else if (universities.Count == 0)
+    {
+        <p>No universities found for this country.</p>
+    }
+    else if (FilteredUniversities.Count == 0)
+    {
+        <p>No universities match your search.</p>
+    }
+    else
+    {
+        @* Displays each university using the reusable UniversityCard component. *@
+        @foreach (var university in FilteredUniversities)
+        {
+            <UniversityCard University="university"
+                            OnUniversitySelected="OnUniversitySelected" />
+        }
+    }
+}
+
+@* Displays details when a university is selected. *@
+@if (selectedUniversity != null)
+{
+    <h2>Selected University</h2>
+    <UniversityDetails University="selectedUniversity" />
+}
+
+@code {
+    // Stores all countries retrieved from the Countries API.
+    private List<Country> countries = new List<Country>();
+
+    // Stores universities retrieved for the selected country.
+    private List<University> universities = new List<University>();
+
+    // Stores the currently selected country.
+    private Country? selectedCountry;
+
+    // Stores the currently selected university.
+    private University? selectedUniversity;
+
+    // Stores the selected country name from the dropdown.
+    private string selectedCountryName = string.Empty;
+
+    // Stores the text entered in the university search field.
+    private string searchText = string.Empty;
+
+    // Controls the loading message for countries.
+    private bool isLoadingCountries = true;
+
+    // Controls the loading message for universities.
+    private bool isLoadingUniversities;
+
+    // Stores an error message when an API request fails.
+    private string errorMessage = string.Empty;
+
+    // Filters universities by name while the user types.
+    private List<University> FilteredUniversities =>
+        universities.Where(university =>
+            university.Name.Contains(
+                searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    // Loads the country list when the page is initialized.
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoadingCountries = true;
+
+            // Retrieves all countries from the Countries API.
+            countries = await CountryService.GetCountriesAsync();
+        }
+        catch
+        {
+            // Displays an error if the Countries API request fails.
+            errorMessage = "Unable to load countries. Please try again.";
+        }
+        finally
+        {
+            // Hides the loading message after the request finishes.
+            isLoadingCountries = false;
+        }
+    }
+
+    // Handles country selection and loads its universities.
+    private async Task OnCountryChanged(ChangeEventArgs e)
+    {
+        selectedCountryName = e.Value?.ToString() ?? string.Empty;
+
+        // Finds the selected country in the country list.
+        selectedCountry = countries.FirstOrDefault(country =>
+            country.Name == selectedCountryName);
+
+        // Clears previous university data and selection.
+        universities.Clear();
+        selectedUniversity = null;
+        searchText = string.Empty;
+        errorMessage = string.Empty;
+
+        if (selectedCountry != null)
+        {
+            try
+            {
+                isLoadingUniversities = true;
+
+                // Retrieves universities for the selected country.
+                universities = await UniversityService.GetUniversitiesAsync(
+                    selectedCountry.Name);
+            }
+            catch
+            {
+                // Displays an error if the Universities API request fails.
+                errorMessage = "Unable to load universities. Please try again.";
+            }
+            finally
+            {
+                // Hides the loading message after the request finishes.
+                isLoadingUniversities = false;
+            }
+        }
+    }
+
+    // Receives the selected university from the UniversityCard component.
+    private void OnUniversitySelected(University university)
+    {
+        selectedUniversity = university;
+    }
+}

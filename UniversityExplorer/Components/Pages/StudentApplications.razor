@@ -1,0 +1,115 @@
+@page "/student-applications"
+@rendermode InteractiveServer
+
+@* Sets the browser page title. *@
+<PageTitle>Student Applications</PageTitle>
+
+@* Injects the service used to retrieve student applications. *@
+@inject StudentApplicationService StudentApplicationService
+
+@* Injects navigation so the user can open the edit page. *@
+@inject NavigationManager Navigation
+
+<h1>Student Applications</h1>
+
+<p>View all student applications submitted to the system.</p>
+
+@* Displays an error message if the API request fails. *@
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+@* Displays a loading message while applications are retrieved. *@
+@if (isLoading)
+{
+    <p>Loading student applications...</p>
+}
+else if (applications.Count == 0)
+{
+    <p>No student applications found.</p>
+}
+else
+{
+    @* Displays the applications retrieved from the API. *@
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student Name</th>
+                <th>University Name</th>
+                <th>Country</th>
+                <th>Course Name</th>
+                <th>Application Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var application in applications)
+            {
+                <tr>
+                    <td>@application.Id</td>
+                    <td>@application.StudentName</td>
+                    <td>@application.University</td>
+                    <td>@application.Country</td>
+                    <td>@application.Course</td>
+                    @* The API does not currently provide an application date. *@
+                    <td>Not available</td>
+                    <td>
+                        <button class="btn btn-primary"
+                                @onclick="() => EditApplication(application.Id)">
+                            Edit
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@* Provides access to the create application page. *@
+<a href="/student-applications/create" class="btn btn-success">
+    Create New Application
+</a>
+
+@code {
+    // Stores the applications retrieved from the API.
+    private List<StudentApplication> applications =
+        new List<StudentApplication>();
+
+    // Controls the loading message while the API request is running.
+    private bool isLoading = true;
+
+    // Stores an error message if the API request fails.
+    private string errorMessage = string.Empty;
+
+    // Loads the applications when the page is initialized.
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Retrieves all applications using the GET request.
+            applications =
+                await StudentApplicationService.GetApplicationsAsync();
+        }
+        catch
+        {
+            // Displays an error if the applications cannot be retrieved.
+            errorMessage =
+                "Unable to load student applications. Please try again.";
+        }
+        finally
+        {
+            // Hides the loading message after the request finishes.
+            isLoading = false;
+        }
+    }
+
+    // Opens the edit page for the selected application.
+    private void EditApplication(int id)
+    {
+        Navigation.NavigateTo("/student-applications/edit/" + id);
+    }
+}

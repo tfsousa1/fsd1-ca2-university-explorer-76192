@@ -1,0 +1,132 @@
+@page "/student-applications/edit/{id:int}"
+@rendermode InteractiveServer
+
+@* Sets the browser page title. *@
+<PageTitle>Edit Student Application</PageTitle>
+
+@* Injects the service used to retrieve and update applications. *@
+@inject StudentApplicationService StudentApplicationService
+
+@* Injects navigation to return to the applications list. *@
+@inject NavigationManager Navigation
+
+<h1>Edit Student Application</h1>
+
+@* Displays an error message if the application cannot be loaded or updated. *@
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+@* Displays a loading message while the application is retrieved. *@
+@if (isLoading)
+{
+    <p>Loading application...</p>
+}
+else if (application != null)
+{
+    @* Displays the reusable form with the existing application data. *@
+    <StudentApplicationForm Application="application"
+                            OnSubmit="UpdateApplication" />
+
+    @* Displays a loading message while the update is submitted. *@
+    @if (isSubmitting)
+    {
+        <p>Updating application...</p>
+    }
+}
+
+@code {
+    // Receives the application ID from the page URL.
+    [Parameter]
+    public int id { get; set; }
+
+    // Stores the application being edited.
+    private StudentApplication? application;
+
+    // Controls the loading message while the application is retrieved.
+    private bool isLoading = true;
+
+    // Controls the loading message while the update is submitted.
+    private bool isSubmitting;
+
+    // Stores an error message if an operation fails.
+    private string errorMessage = string.Empty;
+
+    // Loads the selected application when the page is initialized.
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Retrieves all applications from the API.
+            var applications =
+                await StudentApplicationService.GetApplicationsAsync();
+
+            // Finds the application matching the ID in the URL.
+            application = applications.FirstOrDefault(item => item.Id == id);
+
+            // Displays an error if the application does not exist.
+            if (application == null)
+            {
+                errorMessage = "Student application not found.";
+            }
+        }
+        catch
+        {
+            // Handles errors while retrieving the application.
+            errorMessage =
+                "Unable to load the student application. Please try again.";
+        }
+        finally
+        {
+            // Hides the loading message after the request finishes.
+            isLoading = false;
+        }
+    }
+
+    // Sends the edited application to the API using PUT.
+    private async Task UpdateApplication()
+    {
+        if (application == null)
+        {
+            return;
+        }
+
+        try
+        {
+            isSubmitting = true;
+            errorMessage = string.Empty;
+
+            // Sends the updated application data using its existing ID.
+            var response =
+                await StudentApplicationService.UpdateApplicationAsync(
+                    id, application);
+
+            // Checks whether the API accepted the update.
+            if (response.IsSuccessStatusCode)
+            {
+                // Returns to the applications list after a successful update.
+                Navigation.NavigateTo("/student-applications");
+            }
+            else
+            {
+                // Displays an error if the API rejects the update.
+                errorMessage =
+                    "Unable to update the application. Please try again.";
+            }
+        }
+        catch
+        {
+            // Handles connection or API errors during the update.
+            errorMessage =
+                "An error occurred while updating the application.";
+        }
+        finally
+        {
+            // Stops the loading message after the request finishes.
+            isSubmitting = false;
+        }
+    }
+}

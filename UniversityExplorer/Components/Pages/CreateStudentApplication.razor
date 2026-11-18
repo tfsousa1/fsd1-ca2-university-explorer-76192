@@ -1,0 +1,96 @@
+@page "/student-applications/create"
+@rendermode InteractiveServer
+
+@* Sets the browser page title. *@
+<PageTitle>Create Student Application</PageTitle>
+
+@* Injects the service used to submit the application. *@
+@inject StudentApplicationService StudentApplicationService
+
+@* Injects navigation to return to the applications list. *@
+@inject NavigationManager Navigation
+
+<h1>Create Student Application</h1>
+
+<p>Complete the form below to submit a new application.</p>
+
+@* Displays a success message after the application is created. *@
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success">
+        @successMessage
+    </div>
+}
+
+@* Displays an error message if the API request fails. *@
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+@* Displays a loading message while the application is being submitted. *@
+@if (isSubmitting)
+{
+    <p>Submitting application...</p>
+}
+
+@* Reuses the shared form component to collect application details. *@
+<StudentApplicationForm Application="application"
+                        OnSubmit="CreateApplication" />
+
+@code {
+    // Stores the information entered into the application form.
+    private StudentApplication application = new StudentApplication();
+
+    // Controls the loading message during submission.
+    private bool isSubmitting;
+
+    // Stores a success message after a successful submission.
+    private string successMessage = string.Empty;
+
+    // Stores an error message if the submission fails.
+    private string errorMessage = string.Empty;
+
+    // Sends the new application to the API using POST.
+    private async Task CreateApplication()
+    {
+        try
+        {
+            isSubmitting = true;
+            successMessage = string.Empty;
+            errorMessage = string.Empty;
+
+            // Sends the application data to the Student Application API.
+            var response =
+                await StudentApplicationService.CreateApplicationAsync(application);
+
+            // Checks whether the API accepted the application.
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = "Student application created successfully.";
+
+                // Returns to the applications list after successful submission.
+                Navigation.NavigateTo("/student-applications");
+            }
+            else
+            {
+                // Displays an error if the API rejects the application.
+                errorMessage =
+                    "Unable to create the application. Please try again.";
+            }
+        }
+        catch
+        {
+            // Handles errors such as connection or API failures.
+            errorMessage =
+                "An error occurred while submitting the application.";
+        }
+        finally
+        {
+            // Stops the loading message after the request finishes.
+            isSubmitting = false;
+        }
+    }
+}

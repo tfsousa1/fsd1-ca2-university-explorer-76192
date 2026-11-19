@@ -1,6 +1,55 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">U</div>
+            <div>
+                <h4>University</h4>
+                <span>EXPLORER PORTAL</span>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="sidebar-label">MAIN MENU</span>
+
+            <NavLink href="/" Match="NavLinkMatch.All" class="sidebar-link">
+                <span class="menu-icon">⌂</span>
+                <span>Home</span>
+            </NavLink>
+
+            <NavLink href="/university-explorer" class="sidebar-link">
+                <span class="menu-icon">◎</span>
+                <span>University Explorer</span>
+            </NavLink>
+
+            <NavLink href="/student-applications" class="sidebar-link">
+                <span class="menu-icon">▤</span>
+                <span>Student Applications</span>
+            </NavLink>
+
+            <NavLink href="/student-applications/create" class="sidebar-link">
+                <span class="menu-icon">＋</span>
+                <span>New Application</span>
+            </NavLink>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <span>University Explorer Portal</span>
+
+            <span class="topbar-status">
+                <span class="status-dot"></span>
+                Academic Portal
+            </span>
+        </header>
+
+        <section class="page-content">
+            @Body
+        </section>
+    </main>
+</div>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.

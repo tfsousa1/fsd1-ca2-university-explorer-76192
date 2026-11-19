@@ -2,56 +2,68 @@
 
 <EditForm Model="Application" OnValidSubmit="SubmitForm">
 
-    @* Checks the form fields using Data Annotations. *@
     <DataAnnotationsValidator />
-
-    @* Displays validation messages for the form. *@
     <ValidationSummary />
 
-    @* Student name field. *@
-    <div class="mb-3">
-        <label>Student Name</label>
-        <InputText class="form-control"
-                   @bind-Value="Application.StudentName" />
-        <ValidationMessage For="@(() => Application.StudentName)" />
-    </div>
+    <div class="application-form">
 
-    @* Email address field. *@
-    <div class="mb-3">
-        <label>Email Address</label>
-        <InputText class="form-control"
-                   @bind-Value="Application.Email" />
-        <ValidationMessage For="@(() => Application.Email)" />
-    </div>
+        @* Student name field. *@
+        <div class="application-form-row">
+            <label>Student Name</label>
+            <div class="application-form-input">
+                <InputText class="form-control"
+                           @bind-Value="Application.StudentName" />
+                <ValidationMessage For="@(() => Application.StudentName)" />
+            </div>
+        </div>
 
-    @* Country field. *@
-    <div class="mb-3">
-        <label>Country</label>
-        <InputText class="form-control"
-                   @bind-Value="Application.Country" />
-        <ValidationMessage For="@(() => Application.Country)" />
-    </div>
+        @* Email address field. *@
+        <div class="application-form-row">
+            <label>Email Address</label>
+            <div class="application-form-input">
+                <InputText class="form-control"
+                           @bind-Value="Application.Email" />
+                <ValidationMessage For="@(() => Application.Email)" />
+            </div>
+        </div>
 
-    @* University name field. *@
-    <div class="mb-3">
-        <label>University Name</label>
-        <InputText class="form-control"
-                   @bind-Value="Application.University" />
-        <ValidationMessage For="@(() => Application.University)" />
-    </div>
+        @* Country field. *@
+        <div class="application-form-row">
+            <label>Country</label>
+            <div class="application-form-input">
+                <InputText class="form-control"
+                           @bind-Value="Application.Country" />
+                <ValidationMessage For="@(() => Application.Country)" />
+            </div>
+        </div>
 
-    @* Course name field. *@
-    <div class="mb-3">
-        <label>Course Name</label>
-        <InputText class="form-control"
-                   @bind-Value="Application.Course" />
-        <ValidationMessage For="@(() => Application.Course)" />
-    </div>
+        @* University name field. *@
+        <div class="application-form-row">
+            <label>University Name</label>
+            <div class="application-form-input">
+                <InputText class="form-control"
+                           @bind-Value="Application.University" />
+                <ValidationMessage For="@(() => Application.University)" />
+            </div>
+        </div>
 
-    @* Submits the form when all validation rules pass. *@
-    <button type="submit" class="btn btn-primary">
-        Submit Application
-    </button>
+        @* Course name field. *@
+        <div class="application-form-row">
+            <label>Course Name</label>
+            <div class="application-form-input">
+                <InputText class="form-control"
+                           @bind-Value="Application.Course" />
+                <ValidationMessage For="@(() => Application.Course)" />
+            </div>
+        </div>
+
+        <div class="application-form-actions">
+            <button type="submit" class="btn btn-primary">
+                Submit Application
+            </button>
+        </div>
+
+    </div>
 
 </EditForm>
 

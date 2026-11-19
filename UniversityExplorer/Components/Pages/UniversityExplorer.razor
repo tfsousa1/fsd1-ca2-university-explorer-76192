@@ -4,13 +4,11 @@
 @inject CountryService CountryService
 @inject UniversityService UniversityService
 
-@* Sets the browser page title. *@
 <PageTitle>University Explorer</PageTitle>
 
 <h1>University Explorer</h1>
 <p>Select a country to explore its universities.</p>
 
-@* Displays an error message when an API request fails. *@
 @if (!string.IsNullOrEmpty(errorMessage))
 {
     <div class="alert alert-danger">
@@ -18,15 +16,13 @@
     </div>
 }
 
-@* Displays a loading message while countries are being retrieved. *@
 @if (isLoadingCountries)
 {
     <p>Loading countries...</p>
 }
 else
 {
-    @* Allows the user to select a country. *@
-    <div class="mb-3">
+    <div class="country-selector mb-4">
         <label for="countrySelect" class="form-label">Select Country</label>
 
         <select id="countrySelect"
@@ -44,59 +40,67 @@ else
     </div>
 }
 
-@* Displays the selected country's information. *@
 @if (selectedCountry != null)
 {
     <CountryDetails Country="selectedCountry" />
-}
 
-@* Displays universities for the selected country. *@
-@if (selectedCountry != null)
-{
-    <h2>Universities</h2>
+    <div class="university-explorer-layout">
 
-    @* Allows the user to search universities by name. *@
-    <div class="mb-3">
-        <label for="universitySearch" class="form-label">
-            Search Universities
-        </label>
+        <section class="university-list-panel">
+            <h2>Universities</h2>
 
-        <input id="universitySearch"
-               class="form-control"
-               placeholder="Search by university name..."
-               @bind="searchText"
-               @bind:event="oninput" />
+            <div class="mb-3">
+                <label for="universitySearch" class="form-label">
+                    Search Universities
+                </label>
+
+                <input id="universitySearch"
+                       class="form-control"
+                       placeholder="Search by university name..."
+                       @bind="searchText"
+                       @bind:event="oninput" />
+            </div>
+
+            @if (isLoadingUniversities)
+            {
+                <p>Loading universities...</p>
+            }
+            else if (universities.Count == 0)
+            {
+                <p>No universities found for this country.</p>
+            }
+            else if (FilteredUniversities.Count == 0)
+            {
+                <p>No universities match your search.</p>
+            }
+            else
+            {
+                @foreach (var university in FilteredUniversities)
+                {
+                    <UniversityCard University="university"
+                                    OnUniversitySelected="OnUniversitySelected" />
+                }
+            }
+        </section>
+
+        <section class="university-details-panel">
+            @if (selectedUniversity != null)
+            {
+                <h2>University Details</h2>
+                <UniversityDetails University="selectedUniversity" />
+            }
+            else
+            {
+                <div class="university-details-placeholder">
+                    <h3>Select a university</h3>
+                    <p>
+                        Choose a university from the list to see its details here.
+                    </p>
+                </div>
+            }
+        </section>
+
     </div>
-
-    @* Displays a loading message while universities are being retrieved. *@
-    @if (isLoadingUniversities)
-    {
-        <p>Loading universities...</p>
-    }
-    else if (universities.Count == 0)
-    {
-        <p>No universities found for this country.</p>
-    }
-    else if (FilteredUniversities.Count == 0)
-    {
-        <p>No universities match your search.</p>
-    }
-    else
-    {
-        @* Displays each university using the reusable UniversityCard component. *@
-        @foreach (var university in FilteredUniversities)
-        {
-            <UniversityCard University="university"
-                            OnUniversitySelected="OnUniversitySelected" />
-        }
-    }
-}
-
-@* Displays details when a university is selected. *@
-@if (selectedUniversity != null)
-{
-    <h2>Selected University</h2>
-    <UniversityDetails University="selectedUniversity" />
 }
 
 @code {
